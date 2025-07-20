@@ -15,6 +15,7 @@ public class DoctorResponseDto {
     private String contact;
 
 
+    //Method for converting doctor  object into doctorResponseDto object.
     public static DoctorResponseDto doctorToDoctorResponseDto(Doctor doctor){
         DoctorResponseDto doctorResponseDto=new DoctorResponseDto();
         doctorResponseDto.setId(doctor.getId());

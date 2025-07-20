@@ -1,6 +1,7 @@
 package com.xynerotech.task.doctor_appointment_booking_platform.servive;
 
 import com.xynerotech.task.doctor_appointment_booking_platform.dto.DoctorCreateDto;
+import com.xynerotech.task.doctor_appointment_booking_platform.dto.DoctorUpdateDto;
 import com.xynerotech.task.doctor_appointment_booking_platform.entity.Doctor;
 import com.xynerotech.task.doctor_appointment_booking_platform.exception.ResourceNotFoundException;
 import com.xynerotech.task.doctor_appointment_booking_platform.repository.DoctorRepository;
@@ -27,6 +28,7 @@ public class DoctorServiceImpl implements DoctorService{
         return doctorRepository.save(doctor);
     }
 
+
     //service method for getting a doctor by id.
     @Override
     public Doctor getDoctorByID(Long doctorId) {
@@ -36,37 +38,58 @@ public class DoctorServiceImpl implements DoctorService{
                         ("Doctor with id '"+doctorId+"' not exists."));
     }
 
+
     //service method for getting all doctors.
     @Override
     public List<Doctor> getAllDoctor() {
         return  doctorRepository.findAll();
     }
 
+
+
+    //service method for deleting an doctor.
     @Override
-    public String deleteDoctor(Long doctorId) {
-        doctorRepository.deleteById(doctorId);
-        return "doctor deleted successfully.";
+    public void deleteDoctor(Long doctorId) {
+        Doctor doctor = doctorRepository.findById(doctorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor with id '" + doctorId + "' not found."));
+
+        doctorRepository.delete(doctor);
     }
 
-    //service method for updating doctor.
+
+    //service method for updating an doctor.
     @Override
-    public String updateDoctor(Long doctorId, Doctor updatedDoctor) {
-       Doctor returnedDoctor=doctorRepository
+    public DoctorUpdateDto updateDoctor(Long doctorId, DoctorUpdateDto updatedDoctor) {
+        Doctor returnedDoctor = doctorRepository
                 .findById(doctorId)
-                .orElseThrow(()-> new ResourceNotFoundException
-                        ("Doctor with id '"+doctorId+"' not exists."));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Doctor with id '" + doctorId + "' not exists."));
 
-       if(updatedDoctor.getName()!=null)
-         returnedDoctor.setName(updatedDoctor.getName());
+        boolean isAnyFieldUpdated = false;
 
-       if(updatedDoctor.getSpecialization()!=null)
-           returnedDoctor.setSpecialization(updatedDoctor.getSpecialization());
+        if (updatedDoctor.getName() != null && !updatedDoctor.getName().trim().isEmpty()) {
+            returnedDoctor.setName(updatedDoctor.getName().trim());
+            isAnyFieldUpdated = true;
+        }
 
-        if(updatedDoctor.getContact()!=null)
-           returnedDoctor.setContact(updatedDoctor.getContact());
+        if (updatedDoctor.getSpecialization() != null && !updatedDoctor.getSpecialization().trim().isEmpty()) {
+            returnedDoctor.setSpecialization(updatedDoctor.getSpecialization().trim());
+            isAnyFieldUpdated = true;
+        }
+
+        if (updatedDoctor.getContact() != null && !updatedDoctor.getContact().trim().isEmpty()) {
+            returnedDoctor.setContact(updatedDoctor.getContact().trim());
+            isAnyFieldUpdated = true;
+        }
+
+        if (!isAnyFieldUpdated) {
+            throw new IllegalArgumentException("At least one field (name, specialization, or contact) must be provided for update.");
+        }
 
         doctorRepository.save(returnedDoctor);
-        return "Doctor successfully updated";
+
+        return DoctorUpdateDto.doctorToDoctorUpdateDto(returnedDoctor);
     }
+
 
 }

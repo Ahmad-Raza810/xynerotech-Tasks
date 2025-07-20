@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+//A class for customizing api responses.
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
