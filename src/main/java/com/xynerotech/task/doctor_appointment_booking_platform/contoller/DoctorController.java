@@ -1,7 +1,10 @@
 package com.xynerotech.task.doctor_appointment_booking_platform.contoller;
 
 
+import com.xynerotech.task.doctor_appointment_booking_platform.dto.DoctorCreateDto;
+import com.xynerotech.task.doctor_appointment_booking_platform.dto.DoctorResponseDto;
 import com.xynerotech.task.doctor_appointment_booking_platform.entity.Doctor;
+import com.xynerotech.task.doctor_appointment_booking_platform.response.ApiResponse;
 import com.xynerotech.task.doctor_appointment_booking_platform.servive.DoctorService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -24,16 +28,32 @@ public class DoctorController {
 
     // Api endpoint for adding a new doctor.
     @PostMapping("/doctor")
-    public ResponseEntity<String> addDoctor(@Valid @RequestBody Doctor doctor){
-        String response=doctorService.addDoctor(doctor);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    public ResponseEntity<ApiResponse<DoctorCreateDto>> addDoctor(@Valid @RequestBody DoctorCreateDto doctorCreateDto){
+        Doctor doctor=doctorService.addDoctor(doctorCreateDto);
+        ApiResponse<DoctorCreateDto> response=new ApiResponse<>(
+                "Doctor created successfully.",
+                DoctorCreateDto.doctorToDoctorCreateDto(doctor),
+                LocalDateTime.now(),
+                HttpStatus.CREATED.value()
+        );
+        return new ResponseEntity<ApiResponse<DoctorCreateDto>>(response, HttpStatus.CREATED);
     }
+
+
 
     // Api endpoint for getting a doctor by id.
     @GetMapping("/doctor/{doctorId}")
-    public ResponseEntity<Doctor> getDoctorByID(@PathVariable("doctorId") Long doctorId){
+    public ResponseEntity<ApiResponse<DoctorResponseDto>> getDoctorByID(@PathVariable("doctorId") Long doctorId){
         Doctor returnedDoctor=doctorService.getDoctorByID(doctorId);
-        return new ResponseEntity<>(returnedDoctor, HttpStatus.OK);
+        DoctorResponseDto doctorResponseDto=DoctorResponseDto.doctorToDoctorResponseDto(returnedDoctor);
+
+        ApiResponse<DoctorResponseDto> response=new ApiResponse<>(
+                "Doctor fetched successfully.",
+                doctorResponseDto,
+                LocalDateTime.now(),
+                HttpStatus.OK.value()
+                );
+       return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     // Api endpoint for getting all  doctors.
