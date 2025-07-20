@@ -1,5 +1,6 @@
 package com.xynerotech.task.doctor_appointment_booking_platform.servive;
 
+import com.xynerotech.task.doctor_appointment_booking_platform.dto.DoctorCreateDto;
 import com.xynerotech.task.doctor_appointment_booking_platform.entity.Doctor;
 import com.xynerotech.task.doctor_appointment_booking_platform.exception.ResourceNotFoundException;
 import com.xynerotech.task.doctor_appointment_booking_platform.repository.DoctorRepository;
@@ -21,9 +22,9 @@ public class DoctorServiceImpl implements DoctorService{
 
     //service method for adding a new doctor.
     @Override
-    public String addDoctor(Doctor doctor) {
-        doctorRepository.save(doctor);
-        return "Doctor successfully added.";
+    public Doctor addDoctor(DoctorCreateDto createDoctorDto) {
+        Doctor doctor=DoctorCreateDto.doctorCreateDtoToDoctor(createDoctorDto);
+        return doctorRepository.save(doctor);
     }
 
     //service method for getting a doctor by id.
